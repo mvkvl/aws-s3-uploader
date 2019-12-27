@@ -1,0 +1,5 @@
+#!/usr/bin//env bash
+
+JARFILE="aws-s3-uploader"
+
+./mvnw clean package && cd target && tar cvfz ${JARFILE}.tar.gz ${JARFILE}.jar

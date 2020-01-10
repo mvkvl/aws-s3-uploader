@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import ws.slink.config.AppConfig;
 import ws.slink.model.ProcessingResult;
@@ -17,6 +18,7 @@ import java.time.Instant;
 @Slf4j
 @Component
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@DependsOn({"commandLineArguments"})
 public class Processor {
 
     private final @NonNull AppConfig appConfig;
@@ -25,15 +27,14 @@ public class Processor {
 
     public String process() {
 
+        appConfig.printParams();
+
         long timeA = Instant.now().toEpochMilli();
 
         // cleanup bucket
-        if(!appConfig.isClean()) {
-            log.info("Cleaning up bucket {}" + appConfig.getBucket());
-            awsS3Service.clean(appConfig.getBucket());
-//            appConfig.getClean()
-//                .stream()
-//                .forEach(s -> log.info("Removed " + confluence.cleanSpace(s) + " page(s) from " + s));
+        if(appConfig.isClean()) {
+            log.info("Cleaning up {}/{}", appConfig.getBucket(), appConfig.getRoot());
+            awsS3Service.clean(appConfig.getBucket(), appConfig.getRoot());
         }
 
         long timeB = Instant.now().toEpochMilli();

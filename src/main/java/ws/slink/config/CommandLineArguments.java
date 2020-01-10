@@ -30,13 +30,11 @@ public class CommandLineArguments {
         }
         if (args.containsOption("root")) {
             appConfig.setRoot(args.getOptionValues("root").get(0));
+            if (appConfig.getRoot().equalsIgnoreCase("root"))
+                appConfig.setRoot("");
         }
         if (args.containsOption("clean")) {
             appConfig.setClean(true);
         }
     }
-
-
-
-
 }

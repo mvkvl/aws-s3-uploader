@@ -50,15 +50,23 @@ public class UploaderApplicationRunner implements CommandLineRunner, Application
     }
 
     public void printUsage() {
+        System.out.println();
         System.out.println("Usage: ");
-        System.out.println("  java -jar aws-s3-uploader.jar --key=<access key> --secret=<access secret> --bucket=<s3-bucket> --root=<root-directory-name> [--region=<aws region>] [--clean] [--dir=<path/to/directory>]");
-        System.out.println("\t--dir\t\tDirectory to upload to s3 recursively");
-        System.out.println("\t--clean\t\tRemove all existing files before upload");
+        System.out.println("  java -jar aws-s3-uploader.jar <arguments>");
+        System.out.println("\t--dir\t\tDirectory to upload to s3 recursively. If not set, no upload action will be taken.");
+        System.out.println("\t--clean\t\tRemove all existing files from given root. If no --dir is set, only cleanup will be performed.");
         System.out.println("\t--key\t\tAWS access key");
-        System.out.println("\t--secret\t\tAWS access secret");
+        System.out.println("\t--secret\tAWS access secret");
         System.out.println("\t--bucket\tAWS bucket");
-        System.out.println("\t--region\tAWS region");
-        System.out.println("\t--root\t\troot directory in the bucket (deafult is 'resources')");
+        System.out.println("\t--region\tAWS region (default is 'US_EAST_1')");
+        System.out.println("\t--root\t\tRoot 'directory' in the bucket (default is 'resources'; special value 'root' to perform action on bucket itself)");
+        System.out.println();
+        System.out.println("  Any argument can be taken from environment variables of form 's3u_<argument>'. ");
+        System.out.println("  For example AWS credentials can be set via environment like this:");
+        System.out.println("\n     export s3u_key=AWSKEY");
+        System.out.println("     export s3u_secret=AWSSECRET\n");
+        System.out.println("  In this case, there's no need to set credentials via command line arguments.");
+        System.out.println();
     }
 
 }

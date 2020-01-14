@@ -27,33 +27,39 @@ public class Processor {
 
     public String process() {
 
-        appConfig.printParams();
+        if (awsS3Service.connect()) {
 
-        long timeA = Instant.now().toEpochMilli();
+            appConfig.printParams();
 
-        // cleanup bucket
-        if(appConfig.isClean()) {
-            log.info("Cleaning up {}/{}", appConfig.getBucket(), appConfig.getRoot());
-            awsS3Service.clean(appConfig.getBucket(), appConfig.getRoot());
+            long timeA = Instant.now().toEpochMilli();
+
+            // cleanup bucket
+            if (appConfig.isClean()) {
+                log.info("Cleaning up {}/{}", appConfig.getBucket(), appConfig.getRoot());
+                awsS3Service.clean(appConfig.getBucket(), appConfig.getRoot());
+            }
+
+            long timeB = Instant.now().toEpochMilli();
+
+            // process documentation sources
+            ProcessingResult result = new ProcessingResult();
+            if (StringUtils.isNotBlank(appConfig.getDir()))
+                result.merge(directoryProcessor.process(new File(appConfig.getDir()).getAbsolutePath()));
+
+            long timeC = Instant.now().toEpochMilli();
+
+            return new StringBuilder()
+                    .append("-------------------------------------------------------------").append("\n")
+                    .append("total time taken   : " + DurationFormatUtils.formatDuration(timeC - timeA, "HH:mm:ss")).append("\n")
+                    .append("clean up time      : " + DurationFormatUtils.formatDuration(timeB - timeA, "HH:mm:ss")).append("\n")
+                    .append("uploading time     : " + DurationFormatUtils.formatDuration(timeC - timeB, "HH:mm:ss")).append("\n")
+                    .append("successful uploads : " + result.successful().get()).append("\n")
+                    .append("upload failures    : " + result.failed().get()).append("\n")
+                    .toString();
+        } else {
+            log.error("could not connect to AWS");
+            return "ERROR: could not connect to AWS";
         }
-
-        long timeB = Instant.now().toEpochMilli();
-
-        // process documentation sources
-        ProcessingResult result = new ProcessingResult();
-        if (StringUtils.isNotBlank(appConfig.getDir()))
-            result.merge(directoryProcessor.process(new File(appConfig.getDir()).getAbsolutePath()));
-
-        long timeC = Instant.now().toEpochMilli();
-
-        return new StringBuilder()
-            .append("-------------------------------------------------------------").append("\n")
-            .append("total time taken   : " + DurationFormatUtils.formatDuration( timeC - timeA, "HH:mm:ss")).append("\n")
-            .append("clean up time      : " + DurationFormatUtils.formatDuration( timeB - timeA, "HH:mm:ss")).append("\n")
-            .append("uploading time     : " + DurationFormatUtils.formatDuration( timeC - timeB, "HH:mm:ss")).append("\n")
-            .append("successful uploads : " + result.successful().get()).append("\n")
-            .append("upload failures    : " + result.failed().get()).append("\n")
-            .toString();
     }
 
 }

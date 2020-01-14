@@ -32,8 +32,7 @@ public class AwsS3Service {
 
     private AmazonS3 s3client;
 
-    @PostConstruct
-    private void createAwsClient() {
+    public boolean connect() {
         try {
             AWSCredentials credentials = new BasicAWSCredentials(
                     appConfig.getKey(),
@@ -44,9 +43,11 @@ public class AwsS3Service {
                     .withCredentials(new AWSStaticCredentialsProvider(credentials))
                     .withRegion(Regions.valueOf(appConfig.getRegion()))
                     .build();
+            return true;
         } catch (Exception e) {
             log.error("can't connect to AWS: {}", e.getMessage());
             s3client = null;
+            return false;
         }
     }
 

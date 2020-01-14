@@ -43,8 +43,8 @@ public class AppConfig {
 
     public void printParams() {
         System.out.println("Source directory: " + dir);
-//        System.out.println("AWS key         : " + key);
-//        System.out.println("AWS secret      : " + secret);
+        System.out.println("AWS key         : " + key);
+        System.out.println("AWS secret      : " + secret);
         System.out.println("AWS region      : " + region);
         System.out.println("AWS bucket      : " + bucket);
         System.out.println("AWS root        : " + root);

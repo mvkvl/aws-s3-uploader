@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<meta-runner name="AWS S3 Uploader">
+    <description>Upload resources to AWS S3</description>
+    <settings>
+        <parameters>
+            <param name="env.AWS_KEY"    value="" spec="password display='normal'" />
+            <param name="env.AWS_SECRET" value="" spec="password display='normal'" />
+            <param name="env.AWS_REGION" value="US_EAST_1" />
+            <param name="env.AWS_BUCKET" value="" />
+            <param name="env.AWS_ROOT"   value="" />
+            <param name="env.SRC_DIR"    value="" />
+        </parameters>
+        <build-runners>
+            <runner name="Download latest aws-s3-uploader" type="simpleRunner">
+                <parameters>
+                    <param name="script.content"><![CDATA[URL="$(curl -s https://api.github.com/repos/dxfeed/aws-s3-uploader/releases/latest | grep "browser_download_url.*tar.gz" | cut -d : -f 2,3 | tr -d \")"
+curl -s -L --url $URL | tar xvz
+ls -l]]></param>
+                    <param name="teamcity.step.mode" value="default" />
+                    <param name="use.custom.script" value="true" />
+                </parameters>
+            </runner>
+            <runner name="Upload Resources" type="simpleRunner">
+                <parameters>
+                    <param name="script.content" value="java -jar aws-s3-uploader.jar --clean --dir=${SRC_DIR} --root=${AWS_ROOT} --key=${AWS_KEY} --secret=${AWS_SECRET} --bucket=${AWS_BUCKET} --region=${AWS_REGION}" />
+                    <param name="teamcity.step.mode" value="default" />
+                    <param name="use.custom.script" value="true" />
+                </parameters>
+            </runner>
+            <runner name="Check Logs" type="simpleRunner">
+                <parameters>
+                    <param name="script.content" value="cat *.log" />
+                    <param name="teamcity.step.mode" value="default" />
+                    <param name="use.custom.script" value="true" />
+                </parameters>
+            </runner>
+            <runner name="Clean up" type="simpleRunner">
+                <parameters>
+                    <param name="script.content" value="rm -rf *" />
+                    <param name="teamcity.step.mode" value="default" />
+                    <param name="use.custom.script" value="true" />
+                </parameters>
+            </runner>
+        </build-runners>
+        <requirements />
+    </settings>
+</meta-runner>
